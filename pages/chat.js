@@ -9,11 +9,14 @@ import { useRouter } from "next/router";
 
 const Chat = ({ username, userLocation }) => {
   const router = useRouter();
-  const pusher = new Pusher(process.env.NEXT_PUBLIC_KEY, {
-    cluster: "eu",
+
+  Pusher.logToConsole = true;
+
+  const pusher = new Pusher("bf55b35ff5f55d173c78", {
+    cluster: "ap1",
     // use jwts in prod
     authEndpoint: `api/pusher/auth`,
-    auth: { params: {username, userLocation}}
+    auth: { params: { username, userLocation } }
   });
 
   const [chats, setChats] = useState([]);
@@ -23,7 +26,7 @@ const Chat = ({ username, userLocation }) => {
   const [usersRemoved, setUsersRemoved] = useState([]);
 
   useEffect(() => {
-    const channel = pusher.subscribe("presence-channel"); 
+    const channel = pusher.subscribe("presence-channel");
 
     // when a new member successfully subscribes to the channel
     channel.bind("pusher:subscription_succeeded", (members) => {
@@ -49,7 +52,7 @@ const Chat = ({ username, userLocation }) => {
 
     // updates chats
     channel.bind("chat-update", function (data) {
-      const {username, message} = data
+      const { username, message } = data
       setChats((prevState) => [
         ...prevState,
         { username, message },
